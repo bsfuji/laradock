@@ -1,0 +1,32 @@
+version: "3"
+services:
+    nginx:
+        build: ./docker/nginx/
+        volumes:
+            - ./laravel:/var/www/laravel/:cached
+        ports:
+            - "80:80"
+    php:
+        build: ./docker/php/
+        volumes:
+            - ./laravel:/var/www/laravel/:cached
+    mysql:
+        build: ./docker/mysql/
+        volumes:
+            - mysql-volume:/var/lib/mysql
+            - ./docker/mysql/initdb.d:/docker-entrypoint-initdb.d
+        environment:
+            MYSQL_DATABASE: laravel
+            MYSQL_ROOT_PASSWORD: laravel
+        ports:
+            - "3306:3306"
+    node:
+        build: ./docker/node/
+        tty: true
+        volumes:
+            - ./laravel:/var/www/laravel/:cached
+        ports:
+            - "3000:3000"
+            - "9229:9229"
+volumes:
+    mysql-volume:
