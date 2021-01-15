@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -18,8 +20,22 @@ class LoginController extends Controller
     | to conveniently provide its functionality to your applications.
     |
     */
+    
+    use AuthenticatesUsers {
+        AuthenticatesUsers::logout as _logout;
+    }
 
-    use AuthenticatesUsers;
+    protected function authenticated(Request $request, $user)
+    {
+        $user->update(['api_token' => Str::random(60)]);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->update(['api_token' => null]);
+
+        return $this->_logout($request);
+    }
 
     /**
      * Where to redirect users after login.
